@@ -31,8 +31,6 @@ class ProductManager {
 
 
 
-//javascript
-
 const productManager = new ProductManager();
 
 const producto1 = {
