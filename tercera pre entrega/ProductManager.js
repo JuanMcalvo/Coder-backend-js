@@ -113,7 +113,7 @@ const producto2 = {
   thumbnail: "ruta/imagen1.jpg",
   code: "001",
   stock: 5
-};
+}; 
 // ProductManager = new ProductManager('./productos.json');
 // ProductManager.getProducts(); 
 // ProductManager.addProduct(producto1);
