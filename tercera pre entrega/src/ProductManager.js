@@ -20,7 +20,7 @@ class ProductManager {
         return;
       }
       this.misProductos.push({
-        Title: product.Title,
+        title: product.title,
         description: product.description,
         price: product.price,
         thumbnail: product.thumbnail,
@@ -39,7 +39,8 @@ class ProductManager {
   async getProducts() {
     try {
       const file = await fs.promises.readFile(this.Path, 'utf-8')
-      console.log(file);
+  /*     console.log(file) */
+      return file;
     } catch (error) {
       console.log(`no se puede leer archivo o el carrito esta vacio`, this.misProductos)
     }
@@ -50,6 +51,7 @@ class ProductManager {
       const product = file.find(e => e.id === id);
       if (product) {
         console.log(product);
+        return product;
       } else {
         console.log('Producto no encontrado');
       }
@@ -114,12 +116,14 @@ const producto2 = {
   code: "001",
   stock: 5
 }; 
-// ProductManager = new ProductManager('./productos.json');
-// ProductManager.getProducts(); 
-// ProductManager.addProduct(producto1);
-// ProductManager.addProduct(producto2);
-// ProductManager.getProducts(); 
+/* ProductManager = new ProductManager('./productos.json');
+ ProductManager.getProducts(); 
+ProductManager.addProduct(producto1);
+ProductManager.addProduct(producto2);
+ ProductManager.getProducts();  */
 // ProductManager.getProductById(171); 
 // ProductManager.updateProduct(171,producto2); 
 //ProductManager.deleteProduct(884);
 //ProductManager.getProducts(); 
+
+module.exports = ProductManager;
