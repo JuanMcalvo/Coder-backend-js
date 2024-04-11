@@ -1,52 +1,61 @@
-import {Router} from "express";
-const router = Router ();
-import {ProductManager} from '../ProductManager.js';
-const productManager = new ProductManager('../productos.json');
+import { Router } from "express";
+const router = Router();
+import { ProductManager } from "../ProductManager.js";
+const productManager = new ProductManager("src/products.json");
 
-router.get('/', async (req, res) => { // lista todos los productos con limit
-    try {
-        let productos = await productManager.getProducts();
-        let limit = req.query.limit ? parseInt(req.query.limit) : null;
-        if (limit !== null && !isNaN(limit)) {
-            productos = JSON.parse(productos);
-            productos = productos.slice(0, limit);
-            productos = JSON.stringify(productos);
-            return res.send(` ${productos}`)
-        }
-        console.log (productos)
-        res.send(`hola ${productos}`)
-    } catch (err) {
-        res.send(err)
+router.get("/", async (req, res) => {
+  // lista todos los products con limit
+  try {
+    let products = await productManager.getProducts();
+    let limit = req.query.limit ? parseInt(req.query.limit) : null;
+    if (limit !== null && !isNaN(limit)) {
+      products = products.slice(0, limit);
+      return res.send(products);
     }
-
-})
-/* 
-router.post('/',async(req, res)=>{          // Agrega un nuevo campo
-
+    res.send(products);
+  } catch (err) {
+    res.send(err);
+  }
 });
 
-router.put('/',async(req, res)=>{
-    
+router.get("/:pid", async (req, res) => {
+  try {
+    let pid = parseInt(req.params.pid);
+    let product = await productManager.getProductById(pid);
+    res.send(product);
+  } catch (err) {
+    res.send(err);
+  }
 });
-router.delete('/',async(req, res)=>{
-    
-}); */
-/* 
-Router.get('/products/:pid', async(req, res)=>{
-    try{
-        let pid = parseInt(req.params.pid);
-        console.log(`producto es  ${pid}`)        
-        let producto = await productManager.getProductById(pid)
-        producto= JSON.stringify(producto);
-    res.send (`el producto es ${producto}`)
-    }
-    catch (err){
-        res.send(err)
-    }
-    
-    
-})
- */
+
+router.post("/", async (req, res) => {
+  // Agrega un nuevo campo
+  const product = req.body;
+  await productManager.addProduct(product);
+  res.status(200).send({ status: "success", payload: product });
+});
+
+router.put("/:pid", async (req, res) => {
+  const { pid } = req.params;
+  const product = req.body;
+  let productNew = await productManager.updateProduct(parseInt(pid), product);
+  if (productNew) {
+    res.status(200).send({ status: "success", payload: productNew });
+  } else {
+    res.status(400).send({ status: "Error, no encontrado"})
+  }
+  
+});
+router.delete("/:pid", async (req, res) => {
+ const {pid} = req.params;
+ let deleteProduct = await productManager.deleteProduct(parseInt(pid));
+ if (deleteProduct)
+{ res.status(200).send({status: "success", })} else {
+ res.status(400).send({ status: "Error, no encontrado"})
+
+}
+
+});
 
 
 export default router;
