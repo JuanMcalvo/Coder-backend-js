@@ -22,16 +22,15 @@ router.get("/:cid", async (req, res) => {
   });
 
 router.post ('/:cid/product/:pid', async(req, res)=>{
-  try {    
+  
   const {cid} = req.params;
   const {pid} = req.params;
-  let cids = parseint(cid);
-  let pids = parseint(pid);
+  let cids = parseInt(cid);
+  let pids = parseInt(pid);
   await carts.addProductCart(cids, pids)
   res.send('Agregado correctamente') 
 
-}catch (errr) {
-  res.send (errr)
-}} )
+
+} )
 
 export default router;

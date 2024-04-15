@@ -72,6 +72,8 @@ export class cart {
 
     async addProductCart(idc, idp) {
         try {
+            console.log(idc);
+            console.log(idp)
             const file = await this.getCart();
             const index = file.findIndex(e => e.id === idc);
 
