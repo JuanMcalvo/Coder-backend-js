@@ -1,5 +1,4 @@
 import fs from 'fs'
-import { ProductManager } from './ProductManager';
 
 
 export class cart {
@@ -8,21 +7,35 @@ export class cart {
         this.path = './src/carts.json';
         this.products = [];
         this.createCart();
-
     }
     async createCart() {
-
         try {
-            const cartData = {
-                id: this.id,
-                products: this.products
-            };
-            let file = await fs.promises.writeFile(this.path, JSON.stringify(cartData, null, 2), 'utf-8');
-            return file;
-        } catch (err) {
-            console.log(err)
+            let cart;
+            try {
+                const fileContent = await fs.promises.readFile(this.path, 'utf-8');
+                cart = JSON.parse(fileContent);
+                cart.push({
+                    id: this.id++,
+                    products: this.products
+                });
+                await fs.promises.writeFile(this.path, JSON.stringify(cart, null, 2), 'utf-8');
+                console.log('Archivo de carrito encontrado y cargado correctamente.');
+            } catch (error) {
+                console.log('No se encontró un archivo de carrito. Creando uno nuevo...');
+                cart = [{
+                    id: this.id++,
+                    products: this.products
+                }];
+                await fs.promises.writeFile(this.path, JSON.stringify(cart, null, 2), 'utf-8');
+            }
+
+            return cart;
+        } catch (error) {
+            console.error('Error al crear o cargar el carrito:', error);
+            return null;
         }
     }
+
     async getCart() {
         try {
             const file = await fs.promises.readFile(this.path, "utf-8");
@@ -34,10 +47,9 @@ export class cart {
     async getCartById(id) {
         try {
             const file = await this.getCart();
-            const cart = file.id === id;
-            console.log(file.id)
+            const cart = file.find(e => id === id);
             if (cart) {
-                return file.products; // Devuelve el carrito completo
+                return cart; // Devuelve el carrito completo
             } else {
                 console.log("Carrito no encontrado");
                 return null; // Devuelve null si el carrito no se encuentra
@@ -61,24 +73,22 @@ export class cart {
     async addProductCart(idc, idp) {
         try {
             const file = await this.getCart();
-            if (file.id === idc) {
-                const exist = ProductManager.getCartById(idp);
-                if (exist) {
-                    const indexp = file.products.findIndex(e => e.id === idp);
-                    if (indexp !== -1) {
-                        file.products[indexp].quantity++;
-                    } else {
-                        file.products.push({ id: idp, quantity: 1 });
-                    }
-                    this.updateCart(file)
+            const index = file.findIndex(e => e.id === idc);
+
+            if (index !== -1) {                
+                const indexp = file[index].products.findIndex(e => e.id === idp);
+
+                if (indexp !== -1) {
+                    file[index].products[indexp].quantity++;
                 } else {
-                    console.log('El producto no existe.');
+                    file[index].products.push({ id: idp, quantity: 1 });
                 }
+                await fs.promises.writeFile(this.path,JSON.stringify(file),'utf-8')
             } else {
                 console.log('El carrito no existe.');
             }
-        } catch (error) {
-            console.error('Error al agregar el producto al carrito:', error);
+        } catch (err) {
+            console.log('Error al agregar producto:', err);
         }
     }
 }
